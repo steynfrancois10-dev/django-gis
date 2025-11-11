@@ -6,6 +6,7 @@ from django.db.models import Count
 from Wildlife.models import AnnualPopulation, Taxon, Property, TaxonRank
 from django.db.models import Sum
 from Wildlife.models import Organisation
+from django.contrib.auth.models import User
 
 class Command(BaseCommand):
     help = "Run Wildlife ORM"
@@ -210,6 +211,23 @@ class Command(BaseCommand):
         else:
             print("   No leaf taxa found.")
 
+    def function_12(self):
+        """Identify the user with most Annual Population records"""
+        print("\n12. Top user by Annual Population records:")
+
+        user_counts = AnnualPopulation.objects.values(
+            'user__id', 'user__username'
+        ).annotate(
+            record_count=Count('id')
+        ).order_by('-record_count')
+
+        if user_counts:
+            top_user = user_counts[0]
+            print(f"   User: {top_user['user__username']}")
+            print(f"   Number of records: {top_user['record_count']}")
+        else:
+            print("   No Annual Population records found.")
+
     def handle(self, *args, **options):
         """Logic of the command"""
         self.function_1()
@@ -223,3 +241,4 @@ class Command(BaseCommand):
         self.function_9()
         self.function_10()
         self.function_11()
+        self.function_12()
