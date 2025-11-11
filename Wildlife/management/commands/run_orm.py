@@ -112,6 +112,23 @@ class Command(BaseCommand):
             print(f"   Total area available to species: {top_org['total_area']}")
         else:
             print("   No organisations or areas found.")
+
+    def function_7(self):
+        """Identify property with most distinct species"""
+        print("\n7. Property with most distinct species:")
+
+        property_species_counts = AnnualPopulation.objects.values(
+            'property__id', 'property__name'
+        ).annotate(
+            species_count=Count('taxon', distinct=True)
+        ).order_by('-species_count')
+
+        if property_species_counts:
+            top_property = property_species_counts[0]
+            print(f"   Property: {top_property['property__name']}")
+            print(f"   Number of distinct species: {top_property['species_count']}")
+        else:
+            print("   No properties or species found.")
     
 
     def handle(self, *args, **options):
@@ -122,3 +139,4 @@ class Command(BaseCommand):
         self.function_4()
         self.function_5()
         self.function_6()
+        self.function_7()
