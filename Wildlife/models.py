@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from django.db import models  # ✅ use standard Django models (no GIS)
+from django.db import models  
 
 # Create your models here.
 class PropertyType(models.Model):
@@ -50,7 +50,7 @@ class Property(models.Model):
     property_type = models.ForeignKey(PropertyType, on_delete=models.DO_NOTHING)
     organisation = models.ForeignKey(Organisation, on_delete=models.DO_NOTHING)
     
-    # ✅ Replace PointField with simple coordinate fields
+
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
 

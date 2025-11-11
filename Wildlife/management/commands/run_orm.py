@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.db.models import Count
 from Wildlife.models import AnnualPopulation, Taxon, Property
 from django.db.models import Sum
+from Wildlife.models import Organisation
 
 class Command(BaseCommand):
     help = "Run Wildlife ORM"
@@ -95,6 +96,24 @@ class Command(BaseCommand):
 
         print(f"   Number of distinct species: {species_count}")
 
+    def function_6(self):
+        """Identify organisation with largest total area available to species"""
+        print("\n6. Organisation with largest total area:")
+
+        org_areas = AnnualPopulation.objects.values(
+            'property__organisation__id', 'property__organisation__name'
+        ).annotate(
+            total_area=Sum('area_available_to_species')
+        ).order_by('-total_area')
+
+        if org_areas:
+            top_org = org_areas[0]
+            print(f"   Organisation: {top_org['property__organisation__name']}")
+            print(f"   Total area available to species: {top_org['total_area']}")
+        else:
+            print("   No organisations or areas found.")
+    
+
     def handle(self, *args, **options):
         """Logic of the command"""
         self.function_1()
@@ -102,3 +121,4 @@ class Command(BaseCommand):
         self.function_3()
         self.function_4()
         self.function_5()
+        self.function_6()
