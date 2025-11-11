@@ -3,7 +3,7 @@ from Wildlife.models import Property
 from Wildlife.models import Province
 from django.db.models import Q
 from django.db.models import Count
-from Wildlife.models import AnnualPopulation, Taxon, Property
+from Wildlife.models import AnnualPopulation, Taxon, Property, TaxonRank
 from django.db.models import Sum
 from Wildlife.models import Organisation
 
@@ -163,6 +163,38 @@ class Command(BaseCommand):
             print(f"   Total adult males: {top_province['total_adult_males']}")
         else:
             print("   No provinces or adult male data found.")
+
+    def function_10(self, scientific_name="Acinonyx jubatus", rank_name=None):
+        """Display parent and child taxa for a given taxon"""
+        print(f"\n10. Taxon parent and child taxa for '{scientific_name}':")
+
+        try:
+            if rank_name:
+                rank = TaxonRank.objects.get(name__iexact=rank_name)
+                taxon = Taxon.objects.get(scientific_name__iexact=scientific_name, taxon_rank=rank)
+            else:
+                taxon = Taxon.objects.get(scientific_name__iexact=scientific_name)
+        except Taxon.DoesNotExist:
+            print(f"   Taxon '{scientific_name}' not found.")
+            return
+        except TaxonRank.DoesNotExist:
+            print(f"   Rank '{rank_name}' not found.")
+            return
+
+        # Parent taxon
+        if taxon.parent:
+            print(f"   Parent taxon: {taxon.parent.scientific_name}")
+        else:
+            print("   Parent taxon: None")
+
+        # Child taxa
+        children = Taxon.objects.filter(parent=taxon)
+        if children.exists():
+            print("   Child taxa:")
+            for child in children:
+                print(f"     - {child.scientific_name}")
+        else:
+            print("   Child taxa: None")
     
 
     def handle(self, *args, **options):
@@ -176,3 +208,4 @@ class Command(BaseCommand):
         self.function_7()
         self.function_8()
         self.function_9()
+        self.function_10()
