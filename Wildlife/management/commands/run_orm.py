@@ -196,6 +196,19 @@ class Command(BaseCommand):
         else:
             print("   Child taxa: None")
     
+    def function_11(self):
+        """List all taxa without child taxa (leaf taxa)"""
+        print("\n11. Taxa without children (leaf taxa):")
+
+        # Leaf taxa = taxa that are not a parent of any other taxon
+        all_taxa = Taxon.objects.all()
+        leaf_taxa = [taxon for taxon in all_taxa if not Taxon.objects.filter(parent=taxon).exists()]
+
+        if leaf_taxa:
+            for i, taxon in enumerate(sorted(leaf_taxa, key=lambda x: x.scientific_name), start=1):
+                print(f"   {i}. {taxon.scientific_name}")
+        else:
+            print("   No leaf taxa found.")
 
     def handle(self, *args, **options):
         """Logic of the command"""
@@ -209,3 +222,4 @@ class Command(BaseCommand):
         self.function_8()
         self.function_9()
         self.function_10()
+        self.function_11()
