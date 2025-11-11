@@ -3,6 +3,8 @@ from Wildlife.models import Property
 from Wildlife.models import Province
 from django.db.models import Q
 from django.db.models import Count
+from Wildlife.models import AnnualPopulation, Taxon
+from django.db.models import Sum
 
 class Command(BaseCommand):
     help = "Run Wildlife ORM"
@@ -51,10 +53,36 @@ class Command(BaseCommand):
         else:
             print("   No provinces found.")
 
+    def function_4(self):
+        """Annual population for Acinonyx jubatus in 2021"""
+        print("\n4. Annual population for Acinonyx jubatus (2021):")
+
+        try:
+            cheetah_taxon = Taxon.objects.get(scientific_name__iexact='Acinonyx jubatus')
+        except Taxon.DoesNotExist:
+            print("   No taxon found for Acinonyx jubatus.")
+            return
+
+        population_data = AnnualPopulation.objects.filter(
+            taxon=cheetah_taxon,
+            year=2021
+        ).aggregate(
+            total_males=Sum('adult_male'),
+            total_females=Sum('adult_female')
+        )
+
+        total_males = population_data['total_males'] or 0
+        total_females = population_data['total_females'] or 0
+
+        print(f"   Total adult males: {total_males}")
+        print(f"   Total adult females: {total_females}")
+        print(f"   Total individuals: {total_males + total_females}")
+        
+
 
     def handle(self, *args, **options):
         """Logic of the command"""
         self.function_1()
         self.function_2()
         self.function_3()
-
+        self.function_4()
