@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 from pathlib import Path
 
 
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "FarmApp",
+    "Wildlife",
     
 ]
 
