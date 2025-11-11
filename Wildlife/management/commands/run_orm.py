@@ -3,7 +3,7 @@ from Wildlife.models import Property
 from Wildlife.models import Province
 from django.db.models import Q
 from django.db.models import Count
-from Wildlife.models import AnnualPopulation, Taxon
+from Wildlife.models import AnnualPopulation, Taxon, Property
 from django.db.models import Sum
 
 class Command(BaseCommand):
@@ -78,7 +78,22 @@ class Command(BaseCommand):
         print(f"   Total adult females: {total_females}")
         print(f"   Total individuals: {total_males + total_females}")
         
+    
+    def function_5(self):
+        """Count distinct species for 'Zakki Property'"""
+        print("\n5. Species count for 'Zakki Property':")
 
+        try:
+            zakki_property = Property.objects.get(name__iexact='Zakki Property')
+        except Property.DoesNotExist:
+            print("   Property 'Zakki Property' not found.")
+            return
+
+        species_count = AnnualPopulation.objects.filter(
+            property=zakki_property
+        ).values('taxon').distinct().count()
+
+        print(f"   Number of distinct species: {species_count}")
 
     def handle(self, *args, **options):
         """Logic of the command"""
@@ -86,3 +101,4 @@ class Command(BaseCommand):
         self.function_2()
         self.function_3()
         self.function_4()
+        self.function_5()
