@@ -146,6 +146,23 @@ class Command(BaseCommand):
             print(f"   Total animal count: {top_property['total_animals']}")
         else:
             print("   No properties or animal data found.")
+
+    def function_9(self):
+        """Identify province with highest total adult male count"""
+        print("\n9. Province with highest adult male count:")
+
+        province_totals = AnnualPopulation.objects.values(
+            'property__province__id', 'property__province__name'
+        ).annotate(
+            total_adult_males=Sum('adult_male')
+        ).order_by('-total_adult_males')
+
+        if province_totals:
+            top_province = province_totals[0]
+            print(f"   Province: {top_province['property__province__name']}")
+            print(f"   Total adult males: {top_province['total_adult_males']}")
+        else:
+            print("   No provinces or adult male data found.")
     
 
     def handle(self, *args, **options):
@@ -158,3 +175,4 @@ class Command(BaseCommand):
         self.function_6()
         self.function_7()
         self.function_8()
+        self.function_9()
