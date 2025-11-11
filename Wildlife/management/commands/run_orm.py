@@ -129,6 +129,23 @@ class Command(BaseCommand):
             print(f"   Number of distinct species: {top_property['species_count']}")
         else:
             print("   No properties or species found.")
+
+    def function_8(self):
+        """Identify property with highest total animal count"""
+        print("\n8. Property with most animal count:")
+
+        property_totals = AnnualPopulation.objects.values(
+            'property__id', 'property__name'
+        ).annotate(
+            total_animals=Sum('total')
+        ).order_by('-total_animals')
+
+        if property_totals:
+            top_property = property_totals[0]
+            print(f"   Property: {top_property['property__name']}")
+            print(f"   Total animal count: {top_property['total_animals']}")
+        else:
+            print("   No properties or animal data found.")
     
 
     def handle(self, *args, **options):
@@ -140,3 +157,4 @@ class Command(BaseCommand):
         self.function_5()
         self.function_6()
         self.function_7()
+        self.function_8()
