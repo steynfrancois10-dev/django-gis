@@ -2,8 +2,7 @@ from django.core.management.base import BaseCommand
 from Wildlife.models import Property
 from Wildlife.models import Province
 from django.db.models import Q
-
-
+from django.db.models import Count
 
 class Command(BaseCommand):
     help = "Run Wildlife ORM"
@@ -35,9 +34,27 @@ class Command(BaseCommand):
         else:
             print("   No provinces found.")
 
+    def function_3(self):
+        """Display organisation and property count per province"""
+        print("\n3. Organisation and Property Count per Province:")
+
+        provinces = Province.objects.annotate(
+            org_count=Count('organisation', distinct=True),
+            prop_count=Count('property', distinct=True)
+        ).filter(
+            Q(organisation__isnull=False) | Q(property__isnull=False)
+        ).order_by('name')
+
+        if provinces.exists():
+            for i, province in enumerate(provinces, start=1):
+                print(f"   {i}. {province.name}: {province.org_count} organisation(s), {province.prop_count} propert(y/ies)")
+        else:
+            print("   No provinces found.")
+
+
     def handle(self, *args, **options):
         """Logic of the command"""
         self.function_1()
         self.function_2()
-
+        self.function_3()
 
