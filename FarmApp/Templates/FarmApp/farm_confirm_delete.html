@@ -1,0 +1,7 @@
+<h1>Delete Farm</h1>
+<p>Are you sure you want to delete {{ object.name }}?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Yes, delete</button>
+</form>

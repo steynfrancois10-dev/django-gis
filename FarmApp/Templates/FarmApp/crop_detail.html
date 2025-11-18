@@ -1,0 +1,7 @@
+<h1>{{ object.get_crop_type_display }}</h1>
+
+<p><strong>Farm:</strong> {{ object.farm.name }}</p>
+<p><strong>Planted Area:</strong> {{ object.planted_area }} hectares</p>
+
+<a href="{% url 'crop-update' object.pk %}">Edit</a> |
+<a href="{% url 'crop-delete' object.pk %}">Delete</a>

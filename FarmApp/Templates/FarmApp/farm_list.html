@@ -1,0 +1,17 @@
+{% extends "FarmApp/base.html" %}
+{% block title %}Farms{% endblock %}
+
+{% block content %}
+<h1>Farms</h1>
+<a class="btn btn-primary mb-3" href="{% url 'farm-create' %}">Create New Farm</a>
+<ul class="list-group">
+    {% for farm in object_list %}
+        <li class="list-group-item">
+            <a href="{% url 'farm-detail' farm.pk %}">
+                {{ farm.name }}
+            </a>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}
+
