@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Farm & Crop Map</h3>
+
+<div id="map" style="height: 600px;"></div>
+
+<script>
+// ---------------------------------------------
+// INITIALIZE MAP
+// ---------------------------------------------
+var map = L.map('map').setView([-26.7, 27.1], 10);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+// ---------------------------------------------
+// DRAW CONTROL SETUP
+// ---------------------------------------------
+var drawnItems = new L.FeatureGroup();
+map.addLayer(drawnItems);
+
+var drawControl = new L.Control.Draw({
+    edit: { featureGroup: drawnItems },
+    draw: {
+        polygon: true,
+        marker: true,
+        polyline: false,
+        circle: false,
+        rectangle: true
+    }
+});
+map.addControl(drawControl);
+
+// ---------------------------------------------
+// SAVE GEOMETRY TO DJANGO VIA AJAX
+// ---------------------------------------------
+function sendToServer(layer, type) {
+    var geojson = layer.toGeoJSON();
+
+    var name = prompt("Enter name for this " + type + ": ");
+    if (!name) name = "Unnamed";
+
+    fetch("{% url 'save_geojson' %}", {
+        method: "POST",
+        headers: { 
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({
+            geojson: geojson.geometry,
+            type: type,
+            name: name
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Saved:", data);
+        alert(type.toUpperCase() + " saved successfully!");
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Error saving geometry.");
+    });
+}
+
+// ---------------------------------------------
+// HANDLE NEW DRAWN SHAPES
+// ---------------------------------------------
+map.on(L.Draw.Event.CREATED, function (event) {
+    var layer = event.layer;
+    drawnItems.addLayer(layer);
+
+    var choice = prompt("Is this a 'farm' or a 'crop'?");
+
+    if (choice === "farm" || choice === "crop") {
+        sendToServer(layer, choice);
+    } else {
+        alert("Invalid type, nothing saved.");
+    }
+});
+
+// ---------------------------------------------
+// LOAD EXISTING SHAPES FROM DJANGO
+// ---------------------------------------------
+fetch("{% url 'get_geojson' %}")
+.then(response => response.json())
+.then(data => {
+
+    // FARMS (polygon)
+    data.farms.forEach(f => {
+        if (f.geojson) {
+            L.geoJSON(f.geojson, {
+                style: { color: "green", weight: 2 },
+                onEachFeature: (feature, layer) => {
+                    layer.bindPopup("Farm: " + f.name);
+                }
+            }).addTo(map);
+        }
+    });
+
+    // CROPS (polygon or marker)
+    data.crops.forEach(c => {
+        if (c.geojson) {
+            L.geoJSON(c.geojson, {
+                style: { color: "yellow", weight: 2 },
+                onEachFeature: (feature, layer) => {
+                    layer.bindPopup("Crop: " + c.name);
+                }
+            }).addTo(map);
+        }
+    });
+
+});
+</script>
+
+{% endblock %}
+

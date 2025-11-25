@@ -1,4 +1,8 @@
-<h1>Crop Form</h1>
+{% load leaflet_tags %}
+{% leaflet_js %}
+{% leaflet_css %}
+
+<h1>Create Crop</h1>
 
 <form method="post">
     {% csrf_token %}

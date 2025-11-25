@@ -1,0 +1,8 @@
+{
+    "terminal.integrated.env.windows": {
+        "GDAL_DATA": "C:/Users/steyn/miniconda3_2/envs/gdal_env310/Library/share/gdal",
+        "PROJ_LIB": "C:/Users/steyn/miniconda3_2/envs/gdal_env310/Library/share/proj",
+        "PATH": "C:/Users/steyn/miniconda3_2/envs/gdal_env310/Library/bin;${env:PATH}"
+    }
+}
+

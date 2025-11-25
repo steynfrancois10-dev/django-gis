@@ -3,7 +3,8 @@
 
 {% block content %}
 <h1>Farms</h1>
-<a class="btn btn-primary mb-3" href="{% url 'farm-create' %}">Create New Farm</a>
+<a class="btn btn-primary mb-3" href="{% url 'FarmApp:farm-create' %}">Create New Farm</a>
+<a href="{% url 'FarmApp:farm_map' %}" class="btn btn-primary">Draw Farms & Crops</a>
 <ul class="list-group">
     {% for farm in object_list %}
         <li class="list-group-item">

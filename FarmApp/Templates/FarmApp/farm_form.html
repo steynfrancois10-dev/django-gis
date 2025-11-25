@@ -1,4 +1,8 @@
-<h1>Farm Form</h1>
+{% load leaflet_tags %}
+{% leaflet_js %}
+{% leaflet_css %}
+
+<h1>Create Farm</h1>
 
 <form method="post">
     {% csrf_token %}

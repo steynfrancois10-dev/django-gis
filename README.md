@@ -1,79 +1,95 @@
-# Farming App — Django Lesson 3 (Class-Based Views & CRUD)
+# Farming App — Django Lesson 4 (Function-Based Views)
 
-This project is part of Django Lesson 3 and demonstrates how to implement **CRUD (Create, Read, Update, Delete)** functionality using Class-Based Views.
-The project uses models from a simple farming system: **Farm, Crop, and Farmer.**
+This project is part of Django Lesson 4 and demonstrates how to implement **CRUD (Create, Read, Update, Delete)** functionality using Function-Based Views.
+The project uses models from a simple farming system: **Farm and Crop.**
+This project is part of a Django GIS learning module and demonstrates how to integrate Leaflet.js, Leaflet Draw, and GeoJSON with Django.
+Users can draw farm boundaries (polygons) and crop locations (points) on an interactive map, save them to the database, and view them later.
 
 ## 🚜 Features Implemented
 
-## 1. Homepage
+## 1. Interactive Mapping System
 
-- A styled landing page with a navigation bar.
+- A fully working map using Leaflet.js
 
-- Provides links to all Farm and Crop views.
+- Users can draw:
 
-## 2. Class-Based Views (CBVs) Added
+    - 🟩 Farm boundaries (Polygon/Rectangle)
 
-For each of the two selected models (Farm and Crop), the full set of CRUD views was implemented:
+    - 🟡 Crop locations (Marker)
+
+- Drawn shapes are saved in the database as GeoJSON
+
+- Existing farms and crops load automatically when the page is opened
+
+## 2. CRUD Functionality (Function-Based Views)
+
+Both Farm and Crop models include full CRUD (Create, Read, Update, Delete) functionality.
 
 ### Farm Views
 
-| Action               | View Type        | URL                   |
-| -------------------- | ---------------- | --------------------- |
-| List all farms       | `FarmListView`   | `/farms/`             |
-| View farm details    | `FarmDetailView` | `/farms/<id>/`        |
-| Create new farm      | `FarmCreateView` | `/farms/create/`      |
-| Update existing farm | `FarmUpdateView` | `/farms/<id>/update/` |
-| Delete farm          | `FarmDeleteView` | `/farms/<id>/delete/` |
+| Action            | View Type     | URL                   |
+| ----------------- | ------------- | --------------------- |
+| List all farms    | `farm_list`   | `/farms/`             |
+| View farm details | `farm_detail` | `/farms/<id>/`        |
+| Create a new farm | `farm_create` | `/farms/create/`      |
+| Update a farm     | `farm_update` | `/farms/<id>/update/` |
+| Delete a farm     | `farm_delete` | `/farms/<id>/delete/` |
 
 ### Crop Views
 
-| Action            | View Type             | URL                   |
-| ----------------- | --------------------- | --------------------- |
-| List all crops    | `CropListView`        | `/crops/`             |
-| View crop details | `CropDetailView`      | `/crops/<id>/`        |
-| Create new crop   | `CropCreateView`      | `/crops/create/`      |
-| Update crop       | `CropUpdateView`      | `/crops/<id>/update/` |
-| Delete crop       | `/crops/<id>/delete/` |                       |
+| Action            | View Type     | URL                   |
+| ----------------- | ------------- | --------------------- |
+| List all crops    | `crop_list`   | `/crops/`             |
+| View crop details | `crop_detail` | `/crops/<id>/`        |
+| Create a crop     | `crop_create` | `/crops/create/`      |
+| Update a crop     | `crop_update` | `/crops/<id>/update/` |
+| Delete a crop     | `crop_delete` | `/crops/<id>/delete/` |
 
 ## 🌾 Models Used
-
-The farming application includes the following models:
 
 ### Farm
 
 - Name
 
-- Location
+- Boundary (GeoJSON Polygon)
 
-- Size (hectares)
+- Automatically stored via Leaflet Draw
 
 ### Crop
 
-- Crop type
+- Name
 
 - Farm (ForeignKey)
 
-- Planted area
+- Location (GeoJSON Point)
 
-### *Farmer (not used in CBV task but part of dataset)*
+## 🗺️ Interactive Map Page
 
-- Name
+The **farm_map.html** page includes:
 
-- Farm
+- Leaflet map centered on Potchefstroom
 
-- Years of experience
+- Polygon + Marker drawing tools
+
+- Auto-fill of geometry into Django forms
+
+- Saving via the /save-geojson/ endpoint
+
+- Display of all saved farms and crops
 
 ## 🧩 Templates
 
-All pages extend a custom base.html that includes:
+All pages extend a styled base.html containing:
 
-- A dark Bootstrap navigation bar
+- Bootstrap navigation bar
 
-- Links to Farms and Crops sections
+- Links to Farms, Crops, and Map
 
-- Bootstrap styling
+- CSRF protection + shared styles
 
-Templates included:
+Templates include:
+
+- base.html
 
 - home.html
 
@@ -85,7 +101,9 @@ Templates included:
 
 - farm_confirm_delete.html
 
-- Same structure for Crop templates
+- crop templates (same structure)
+
+- farm_map.html (Leaflet map)
 
 ## ⚙️ Setup Instructions
 
@@ -132,6 +150,6 @@ This work was completed on the branch:
 
 ~~~
 
-django-lesson-3-cbv
+django-lesson-4-fbv
 
 ~~~
