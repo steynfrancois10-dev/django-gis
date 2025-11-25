@@ -1,7 +1,14 @@
-<h1>Delete Farm</h1>
-<p>Are you sure you want to delete {{ object.name }}?</p>
+<!-- FarmApp/templates/FarmApp/farm_confirm_delete.html -->
+{% extends "FarmApp/base.html" %}
+{% block title %}Delete Farm{% endblock %}
+
+{% block content %}
+<h2>Delete Farm</h2>
+<p>Are you sure you want to delete <strong>{{ farm.name }}</strong>?</p>
 
 <form method="post">
-    {% csrf_token %}
-    <button type="submit">Yes, delete</button>
+  {% csrf_token %}
+  <button type="submit" class="btn btn-danger">Yes, delete</button>
+  <a href="{% url 'FarmApp:farm-list' %}" class="btn btn-secondary">Cancel</a>
 </form>
+{% endblock %}

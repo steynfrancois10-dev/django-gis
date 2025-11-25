@@ -1,7 +1,15 @@
-<h1>{{ object.name }}</h1>
+<!-- FarmApp/templates/FarmApp/farm_detail.html -->
+{% extends "FarmApp/base.html" %}
+{% block title %}{{ farm.name }}{% endblock %}
 
-<p><strong>Location:</strong> {{ object.location }}</p>
-<p><strong>Size:</strong> {{ object.size_hectares }} hectares</p>
+{% block content %}
+<h2>{{ farm.name }}</h2>
 
-<a href="{% url 'farm-update' object.pk %}">Edit</a> |
-<a href="{% url 'farm-delete' object.pk %}">Delete</a>
+<p><strong>Area (ha):</strong> {{ farm.size_hectares|default:"—" }}</p>
+<p><strong>Last updated:</strong> {{ farm.last_update }}</p>
+<p><strong>Last updated by:</strong> {{ farm.last_update_by }}</p>
+
+<a class="btn btn-secondary" href="{% url 'FarmApp:farm-list' %}">Back to list</a>
+<a class="btn btn-primary" href="{% url 'FarmApp:farm-update' farm.pk %}">Edit</a>
+<a class="btn btn-danger" href="{% url 'FarmApp:farm-delete' farm.pk %}">Delete</a>
+{% endblock %}

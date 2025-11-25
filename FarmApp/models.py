@@ -1,7 +1,49 @@
 from django.db import models
+from django.contrib.auth.models import User
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import Area
+
+class BaseModel(models.Model):
+    last_update = models.DateTimeField(auto_now=True)
+    last_update_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True, related_name="%(class)s_updates"
+    )
+
+    class Meta:
+        abstract = True
+
+class Farm(BaseModel):
+    name = models.CharField(max_length=150)
+    # Use a GIS field if you have GDAL/GeoDjango, otherwise change to JSONField/text
+    boundary = gis_models.PolygonField(srid=4326, null=True, blank=True)
+    size_hectares = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        # calculate area in hectares if boundary exists
+        if self.boundary:
+            # transform to a projected CRS appropriate for area calc (example uses UTM zone 35S: EPSG 32735)
+            try:
+                # clone=True returns transformed geometry without changing original srid
+                projected = self.boundary.transform(32735, clone=True)
+                # Area(projected).ha gives hectares (requires contrib.gis.measure)
+                self.size_hectares = round(Area(projected).ha, 2)
+            except Exception:
+                # fallback: keep size_hectares None if transform fails
+                self.size_hectares = self.size_hectares or None
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+
+class Crop(BaseModel):
+    name = models.CharField(max_length=150)
+    farm = models.ForeignKey(Farm, on_delete=models.CASCADE, related_name="crops", null=True, blank=True)
+    # Using PolygonField to allow small polygon or use PointField if you prefer
+    boundary = gis_models.PolygonField(srid=4326, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
 
 class Farm(models.Model):
     name = models.CharField(max_length=100)

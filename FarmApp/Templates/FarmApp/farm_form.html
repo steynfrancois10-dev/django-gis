@@ -1,11 +1,15 @@
-{% load leaflet_tags %}
-{% leaflet_js %}
-{% leaflet_css %}
+<!-- FarmApp/templates/FarmApp/farm_form.html -->
+{% extends "FarmApp/base.html" %}
+{% block title %}{{ action }} Farm{% endblock %}
 
-<h1>Create Farm</h1>
+{% block content %}
+<h2>{{ action }} Farm</h2>
 
 <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save</button>
+  {% csrf_token %}
+  {{ form.as_p }}
+
+  <button type="submit" class="btn btn-success">{{ action }}</button>
+  <a href="{% url 'FarmApp:farm-list' %}" class="btn btn-secondary">Back to list</a>
 </form>
+{% endblock %}

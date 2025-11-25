@@ -1,91 +1,47 @@
-{% extends 'base.html' %}
+<!-- FarmApp/templates/FarmApp/farm_map.html -->
+{% extends "FarmApp/base.html" %}
 {% block content %}
 <h3>Farm & Crop Map</h3>
 
 <div id="map" style="height: 600px;"></div>
 
-<script>
-// ---------------------------------------------
-// INITIALIZE MAP
-// ---------------------------------------------
-var map = L.map('map').setView([-26.7, 27.1], 10);
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
 
+<script>
+function getCookie(name) {
+    // standard cookie getter
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+
+// Initialize map
+var map = L.map('map').setView([-26.7, 27.1], 10);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-// ---------------------------------------------
-// DRAW CONTROL SETUP
-// ---------------------------------------------
-var drawnItems = new L.FeatureGroup();
-map.addLayer(drawnItems);
+var drawnItems = new L.FeatureGroup().addTo(map);
 
 var drawControl = new L.Control.Draw({
     edit: { featureGroup: drawnItems },
-    draw: {
-        polygon: true,
-        marker: true,
-        polyline: false,
-        circle: false,
-        rectangle: true
-    }
+    draw: { polygon: true, rectangle: true, marker: true, polyline: false, circle: false }
 });
 map.addControl(drawControl);
 
-// ---------------------------------------------
-// SAVE GEOMETRY TO DJANGO VIA AJAX
-// ---------------------------------------------
-function sendToServer(layer, type) {
-    var geojson = layer.toGeoJSON();
-
-    var name = prompt("Enter name for this " + type + ": ");
-    if (!name) name = "Unnamed";
-
-    fetch("{% url 'save_geojson' %}", {
-        method: "POST",
-        headers: { 
-            "Content-Type": "application/json",
-            "X-CSRFToken": "{{ csrf_token }}"
-        },
-        body: JSON.stringify({
-            geojson: geojson.geometry,
-            type: type,
-            name: name
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log("Saved:", data);
-        alert(type.toUpperCase() + " saved successfully!");
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        alert("Error saving geometry.");
-    });
-}
-
-// ---------------------------------------------
-// HANDLE NEW DRAWN SHAPES
-// ---------------------------------------------
-map.on(L.Draw.Event.CREATED, function (event) {
-    var layer = event.layer;
-    drawnItems.addLayer(layer);
-
-    var choice = prompt("Is this a 'farm' or a 'crop'?");
-
-    if (choice === "farm" || choice === "crop") {
-        sendToServer(layer, choice);
-    } else {
-        alert("Invalid type, nothing saved.");
-    }
-});
-
-// ---------------------------------------------
-// LOAD EXISTING SHAPES FROM DJANGO
-// ---------------------------------------------
-fetch("{% url 'get_geojson' %}")
-.then(response => response.json())
+// load existing shapes
+fetch("{% url 'FarmApp:get_geojson' %}")
+.then(r => r.json())
 .then(data => {
-
-    // FARMS (polygon)
     data.farms.forEach(f => {
         if (f.geojson) {
             L.geoJSON(f.geojson, {
@@ -96,8 +52,6 @@ fetch("{% url 'get_geojson' %}")
             }).addTo(map);
         }
     });
-
-    // CROPS (polygon or marker)
     data.crops.forEach(c => {
         if (c.geojson) {
             L.geoJSON(c.geojson, {
@@ -108,9 +62,50 @@ fetch("{% url 'get_geojson' %}")
             }).addTo(map);
         }
     });
+});
 
+// on draw create, ask for type and name then post to server
+map.on(L.Draw.Event.CREATED, function (event) {
+    var layer = event.layer;
+    drawnItems.addLayer(layer);
+
+    var type = prompt("Type 'farm' for boundary (polygon) or 'crop' for crop marker:");
+    if (!type) { alert("No type provided — shape not saved."); return; }
+    type = type.toLowerCase().trim();
+    if (type !== 'farm' && type !== 'crop') {
+        alert("Invalid type. Use 'farm' or 'crop'.");
+        return;
+    }
+
+    var name = prompt("Enter a name for this " + type + ":");
+    if (!name) name = "Unnamed";
+
+    var geojson = layer.toGeoJSON();
+    fetch("{% url 'FarmApp:save_geojson' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrftoken
+        },
+        body: JSON.stringify({
+            geojson: geojson.geometry,
+            type: type,
+            name: name
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.status === "success") {
+            alert(type + " saved (id: " + data.id + ")");
+        } else {
+            alert("Save error: " + (data.error || JSON.stringify(data)));
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Network or server error saving geometry.");
+    });
 });
 </script>
 
 {% endblock %}
-
