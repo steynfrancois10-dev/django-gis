@@ -1,0 +1,16 @@
+{% extends "FarmApp/base.html" %}
+{% block title %}Crops{% endblock %}
+
+{% block content %}
+<h1>Crops</h1>
+<a class="btn btn-primary mb-3" href="{% url 'FarmApp:crop-create' %}">Create New Crop</a>
+<ul class="list-group">
+    {% for crop in object_list %}
+        <li class="list-group-item">
+            <a href="{% url 'crop-detail' crop.pk %}">
+                {{ crop.get_crop_type_display }}
+            </a>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,11 @@
+asgiref==3.11.0
+Django==5.2.8
+django-leaflet==0.32.0
+GDAL==3.11.0
+numpy @ file:///D:/bld/numpy_1747544591878/work/dist/numpy-2.2.6-cp310-cp310-win_amd64.whl#sha256=af66576ce916c795ffa81be9620c8138a3fda6e1713b2bf7775a630e47eca3a8
+pgsql==2.0
+psycopg==3.2.13
+psycopg2-binary==2.9.11
+sqlparse==0.5.3
+typing_extensions==4.15.0
+tzdata==2025.2

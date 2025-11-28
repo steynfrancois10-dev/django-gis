@@ -38,9 +38,19 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.gis",
+    "leaflet",
     "FarmApp",
     
 ]
+
+LEAFLET_CONFIG = {
+    "DEFAULT_CENTER": (-26.45, 27.09),   # Potchefstroom (your area!)
+    "DEFAULT_ZOOM": 10,
+    "MIN_ZOOM": 3,
+    "MAX_ZOOM": 18,
+}
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -76,9 +86,13 @@ WSGI_APPLICATION = "mysite.wsgi.application"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'gisdb',
+        'USER': 'postgres',
+        'PASSWORD': 'Liesbet1',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -124,6 +138,9 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+import os
+
+GDAL_LIBRARY_PATH = r"C:\Users\steyn\miniconda3_2\envs\gdal_env310\Library\bin\gdal.dll"
 
 
 

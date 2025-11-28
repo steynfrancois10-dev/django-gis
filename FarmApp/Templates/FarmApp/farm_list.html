@@ -1,0 +1,50 @@
+<!-- FarmApp/templates/FarmApp/farm_list.html -->
+{% extends "FarmApp/base.html" %}
+{% block title %}Farms{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>Farms</h2>
+  <a class="btn btn-primary" href="{% url 'FarmApp:farm-create' %}">Add Farm</a>
+</div>
+
+<table class="table table-striped">
+  <thead><tr><th>Name</th><th>Area (ha)</th><th>Last update</th><th></th></tr></thead>
+  <tbody>
+    {% for farm in farms %}
+      <tr>
+        <td><a href="{% url 'FarmApp:farm-detail' farm.pk %}">{{ farm.name }}</a></td>
+        <td>{{ farm.size_hectares|default:"—" }}</td>
+        <td>{{ farm.last_update }}</td>
+        <td>
+          <a class="btn btn-sm btn-outline-secondary" href="{% url 'FarmApp:farm-update' farm.pk %}">Edit</a>
+          <a class="btn btn-sm btn-outline-danger" href="{% url 'FarmApp:farm-delete' farm.pk %}">Delete</a>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="4">No farms yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<nav aria-label="Page navigation">
+  <ul class="pagination">
+    {% if farms.has_previous %}
+      <li class="page-item"><a class="page-link" href="?page={{ farms.previous_page_number }}">Previous</a></li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">Previous</span></li>
+    {% endif %}
+
+    <li class="page-item disabled"><span class="page-link">Page {{ farms.number }} of {{ farms.paginator.num_pages }}</span></li>
+
+    {% if farms.has_next %}
+      <li class="page-item"><a class="page-link" href="?page={{ farms.next_page_number }}">Next</a></li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">Next</span></li>
+    {% endif %}
+  </ul>
+</nav>
+
+{% endblock %}
+
+
