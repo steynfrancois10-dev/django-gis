@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Farm List</title>
+</head>
+<body>
+    <h1>Farms</h1>
+    <ul>
+        {% for farm in farms %}
+            <li>{{ farm.name }} - {{ farm.location }}</li>
+        {% empty %}
+            <li>No farms available.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
